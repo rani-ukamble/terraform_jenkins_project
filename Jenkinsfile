@@ -1,14 +1,19 @@
 pipeline {
     agent any
 
-    environment {
-        AWS_REGION = 'us-east-1' // Change to your region
+    environment{
+        GIT_REPO= 'https://github.com/rani-ukamble/terraform_jenkins_project'
+        BRANCH='main'
+        CLONE_DIR="my_floder"
+        AWS_REGION = 'us-east-1' 
     }
+  
+  
 
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/rani-ukamble/terraform_jenkins_project.git'
+                 git branch:"${BRANCH}",url:"${GIT_REPO}"
             }
         }
 

@@ -1,23 +1,19 @@
 pipeline {
     agent any
 
-    environment{
-        GIT_REPO= 'https://github.com/rani-ukamble/terraform_jenkins_project'
-        BRANCH='main'
-        CLONE_DIR="my_floder"
-        AWS_REGION = 'us-east-1' 
+    environment {
+        TF_VERSION = '1.6.0'
+        AWS_REGION = 'us-east-1'
     }
-  
-  
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                 git branch:"${BRANCH}",url:"${GIT_REPO}"
+                git 'https://github.com/rani-ukamble/terraform_jenkins_project.git'
             }
         }
 
-        stage('Terraform Init') {
+        stage('Init') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh 'terraform init'
@@ -25,13 +21,13 @@ pipeline {
             }
         }
 
-        stage('Terraform Validate') {
+        stage('Validate') {
             steps {
                 sh 'terraform validate'
             }
         }
 
-        stage('Terraform Plan') {
+        stage('Plan') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh 'terraform plan -out=tfplan'
@@ -39,9 +35,9 @@ pipeline {
             }
         }
 
-        stage('Terraform Apply') {
+        stage('Apply') {
             steps {
-                input "Approve to apply changes?"
+                input "Approve to apply?"
                 withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh 'terraform apply tfplan'
                 }
